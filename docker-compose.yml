@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+  vprodb:
+    build:
+      context: ./Docker-files/db
+    image: anselemo/vprofiledb
+    container_name: vprodb
+    ports:
+      - "3307:3306"
+    volumes:
+      - vprodbdata:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=vprodbpass
+
+  vprocache01:
+    image: memcached
+    ports:
+      - "11211:11211"
+
+  vprmq01:
+    image: rabbitmq
+    ports:
+      - "15672:15672"
+    environment:
+      - REBBITMO_DEFAULT_USER=guest
+      - REBBITMO_DEFAULT_PASS=guest
+  # redis:
+  #   image: "redis:alpine"
+
+  vproapp:
+    build:
+      context: ./Docker-files/db
+    image: anselemo/vprofileapp
+    container_name: vproapp
+    ports:
+      - "8080:8080"
+    volumes:
+      - vproappdata:/usr/local/tomcat/webapps
+
+  vproweb:
+    build:
+      context: ./Docker-files/web
+    image: anselemo/vprofileweb
+    container_name: vproweb
+    ports:
+      - "80:80"
+volumes:
+  vprodbdata: {}
+  vproappdata: {}
